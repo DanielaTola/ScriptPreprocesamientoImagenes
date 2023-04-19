@@ -1,0 +1,37 @@
+import os
+import cv2
+import numpy as np
+
+# Función para realizar la segmentación por histograma
+def histogram_segmentation(image):
+    # Convertir la imagen a escala de grises
+  gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+  
+  hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+    
+    # Encontrar el valor del umbral a partir del histograma
+  _, thresh = cv2.threshold(gray, np.argmax(hist), 255, cv2.THRESH_BINARY)
+    
+    # Aplicar la máscara de la imagen umbralizada a la imagen original
+  result = cv2.bitwise_and(image, image, mask=thresh)
+    
+  return result
+
+# Definir la carpeta de entrada y la carpeta de salida
+input_dir = "C:/Users/Daniela/Desktop/Utimo DataSet/Nitidez/Etapa4"
+output_dir = "C:/Users/Daniela/Desktop/Utimo DataSet/SegHistograma/Etapa4"
+
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+
+# Iterar sobre las imágenes dentro de la carpeta de entrada
+for filename in os.listdir(input_dir):
+    # Cargar la imagen
+    img = cv2.imread(os.path.join(input_dir, filename))
+    
+    # Realizar la segmentación por histograma
+    result = histogram_segmentation(img)
+    
+    # Guardar la imagen segmentada en la carpeta de salida
+    cv2.imwrite(os.path.join(output_dir, filename), result)
